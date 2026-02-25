@@ -74,6 +74,12 @@ if [ -f "$TARGET_APP_LIST" ]; then
         /<global_brightness_limit/ {
             sub(/nit="[^"]*"/, "nit=\"1600\"")
         }
+        # 关闭 method id="2"~"7" 的应用降亮策略
+        /<method id="[2-7]">/ { in_method = 1 }
+        in_method && /<switch>1<\/switch>/ {
+            sub(/<switch>1<\/switch>/, "<switch>0</switch>")
+        }
+        in_method && /<\/method>/ { in_method = 0 }
         { print }
     ' "$TARGET_APP_LIST" > "$MOD_APP_LIST"
     mount_file "$MOD_APP_LIST" "$TARGET_APP_LIST"
